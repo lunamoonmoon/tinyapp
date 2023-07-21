@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/lunamoonmoon/tinyapp/issues"
   },
-  "homepage": "https://github.com/lunamoonmoon/tinyapp#readme"
+  "homepage": "https://github.com/lunamoonmoon/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
