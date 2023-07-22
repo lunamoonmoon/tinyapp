@@ -4,13 +4,13 @@ const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs"); //set view engine for rendering templates
 
-const urlDatabase = {
+const urlDatabase = { //create database object
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
 
-app.get("/", (req, res) => {
-  const templateVars = { id: req.parems.id, longURL: urlDatabase}; //Use the id from the route parameter to lookup it's associated longURL from the urlDatabase
+app.get("/urls/:id", (req, res) => {
+  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id]}; //Uses the id from route parameter to lookup associated longURL from the urlDatabase
   res.render("urls_show", templateVars);
 });
 
