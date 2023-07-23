@@ -26,7 +26,7 @@ app.get("/urls/new", (req, res) => { //route renders template for user to shorte
 
 app.post("/urls", (req, res) => { //route handler for post reqs to /urls
   const randomString = generateRandomString(); //create a unique id for short url id
-  urlDatabase[randomString] = longURL; //add id and long url to database
+  urlDatabase[randomString] = req.body.longURL; //add id and long url to database
   res.redirect("/urls/:" + randomString); //redirect when post req received
 });
 
