@@ -24,12 +24,6 @@ app.get("/urls/new", (req, res) => { //route renders template for user to shorte
   res.render("urls_new");
 });
 
-app.post("/urls", (req, res) => { //route handler for post reqs to /urls
-  const randomString = generateRandomString(); //create a unique id for short url id
-  urlDatabase[randomString] = req.body.longURL; //add id and long url to database
-  res.redirect("/urls/:" + randomString); //redirect when post req received
-});
-
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
   if (longURL) {
@@ -43,6 +37,17 @@ app.get("/u/:id", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id]}; //Uses the id from route parameter to lookup associated longURL from the urlDatabase
   res.render("urls_show", templateVars); //generates html
+});
+
+app.post("/urls/:id/delete", (req, res) => {
+  delete urlDatabase[req.params.id]; //delete specified url
+  res.redirect("/urls") //return to main page
+});
+
+app.post("/urls", (req, res) => { //route handler for post reqs to /urls
+  const randomString = generateRandomString(); //create a unique id for short url id
+  urlDatabase[randomString] = req.body.longURL; //add id and long url to database
+  res.redirect("/urls/:" + randomString); //redirect when post req received
 });
 
 app.get("/urls", (req, res) => { //shows list of all urls in database
