@@ -20,6 +20,7 @@ function generateRandomString() { //create random 6 digit number string for shor
   return uniqueId.join(""); //make array a string
 }
 
+//delete url
 app.post("/urls/:id/delete", (req, res) => {
   delete urlDatabase[req.params.id]; //delete specified url
   res.redirect("/urls") //return to main page
@@ -43,15 +44,18 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars); //generates html
 });
 
+//update url
 app.post("/urls/:id", (req, res) => {
-  const urlDatabase[longURL] = req.body; //update value of stored long URL based on new value entered
+  const editURL = urlDatabase[req.params.id];
+  urlDatabase[req.params.id] = req.body.editURL; //update value of stored long URL
   res.redirect("/urls");
 })
 
+//add new url
 app.post("/urls", (req, res) => { //route handler for post reqs to /urls
   const randomString = generateRandomString(); //create a unique id for short url id
   urlDatabase[randomString] = req.body.longURL; //add id and long url to database
-  res.redirect("/urls/:" + randomString); //redirect when post req received
+  res.redirect("/urls/" + randomString); //redirect when post req received
 });
 
 app.get("/urls", (req, res) => { //shows list of all urls in database
