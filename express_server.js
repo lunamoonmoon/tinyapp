@@ -36,13 +36,17 @@ app.get("/u/:id", (req, res) => {
   } else {
     res.status(404); //if not found send error message
   }
-
 });
 
 app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id]}; //Uses the id from route parameter to lookup associated longURL from the urlDatabase
   res.render("urls_show", templateVars); //generates html
 });
+
+app.post("/urls/:id", (req, res) => {
+  const urlDatabase[longURL] = req.body; //update value of stored long URL based on new value entered
+  res.redirect("/urls");
+})
 
 app.post("/urls", (req, res) => { //route handler for post reqs to /urls
   const randomString = generateRandomString(); //create a unique id for short url id
