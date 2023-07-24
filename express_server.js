@@ -23,7 +23,7 @@ function generateRandomString() { //create random 6 digit number string for shor
 //delete url
 app.post("/urls/:id/delete", (req, res) => {
   delete urlDatabase[req.params.id]; //delete specified url
-  res.redirect("/urls") //return to main page
+  res.redirect("/urls") //return to list of urls
 });
 
 app.get("/urls/new", (req, res) => { //route renders template for user to shorten new url
@@ -43,6 +43,12 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id]}; //Uses the id from route parameter to lookup associated longURL from the urlDatabase
   res.render("urls_show", templateVars); //generates html
 });
+
+//login with username
+app.post("/urls/login", (req, res) => {
+  res.cookie("username", req.body.username);
+  res.redirect("/urls");
+})
 
 //update url
 app.post("/urls/:id", (req, res) => {
