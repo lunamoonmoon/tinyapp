@@ -4,19 +4,12 @@ const app = express(); //executes express function
 const cookieParser = require('cookie-parser') //parse cookie header and populate req.cookies wuth object
 const PORT = 8080; // default port 8080
 import { urlDatabase } from "./database"; //import database obj
+import { generateRandomString } from "./helperFunctions"; //import function
 
 //middleware for human readability
 app.use(express.urlencoded({ extended: true })); //converts binary into readable data
 app.set("view engine", "ejs"); //set view/template engine for rendering templates
 app.use(cookieParser()); //use cookie obj middleware
-
-function generateRandomString() { //create random 6 digit number string for short url
-  let uniqueId = [];
-  for(let i = 0; i < 6; i++) { //loop up to six digits
-    uniqueId.push(Math.floor(Math.random() * 10)); //number between 0 and 9
-  }
-  return uniqueId.join(""); //make array a string
-}
 
 //delete url
 app.post("/urls/:id/delete", (req, res) => {
@@ -27,6 +20,10 @@ app.post("/urls/:id/delete", (req, res) => {
 app.get("/urls/new", (req, res) => { //route renders template for user to shorten new url
   res.render("urls_new");
 });
+
+app.get("urls/register", (req, res) => {
+  res.render("/urls")
+})
 
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
