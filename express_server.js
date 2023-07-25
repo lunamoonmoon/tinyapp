@@ -3,16 +3,12 @@ const express = require("express"); //creates new instance of express framework
 const app = express(); //executes express function
 const cookieParser = require('cookie-parser') //parse cookie header and populate req.cookies wuth object
 const PORT = 8080; // default port 8080
+import { urlDatabase } from "./database"; //import database obj
 
 //middleware for human readability
 app.use(express.urlencoded({ extended: true })); //converts binary into readable data
 app.set("view engine", "ejs"); //set view/template engine for rendering templates
 app.use(cookieParser()); //use cookie obj middleware
-
-const urlDatabase = { //create database object to store url mappings
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-};
 
 function generateRandomString() { //create random 6 digit number string for short url
   let uniqueId = [];
