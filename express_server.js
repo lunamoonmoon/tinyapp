@@ -1,7 +1,7 @@
 //server set up
 const express = require("express"); //creates new instance of express framework
 const app = express(); //executes express function
-const cookieParser = require('cookie-parser') //parse cookie header and populate req.cookies wuth object
+const cookieParser = require('cookie-parser') //parse cookie header populate req.cookies wuth object
 const PORT = 8080; // default port 8080
 import { urlDatabase } from "./database"; //import database obj
 import { generateRandomString } from "./helperFunctions"; //import function
@@ -21,10 +21,6 @@ app.get("/urls/new", (req, res) => { //route renders template for user to shorte
   res.render("urls_new");
 });
 
-app.get("urls/register", (req, res) => {
-  res.render("/urls")
-})
-
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
   if (longURL) {
@@ -40,23 +36,29 @@ app.get("/urls/:id", (req, res) => {
 });
 
 //login with username
-app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username); //set username cookie
-  res.redirect("/urls");
-})
+app.get("/register", (req, res) => {
+  res.render("urls_register")
+});
 
-//logout button appears
+app.post("/register", (req, res) => {
+  const usernameLogin = req.body.email;
+  const passwordLogin = req.body.password;
+  //for loop here to search for obj
+  return res.redirect("/");
+});
+
+//logout button
 app.post("/logout", (req, res) => {
   res.clearCookie("username"); //clear username cookie
-  res.redirect("/urls");
-})
+  res.redirect("/login");
+});
 
 //update url
 app.post("/urls/:id", (req, res) => {
   const editURL = urlDatabase[req.params.id];
   urlDatabase[req.params.id] = req.body.editURL; //update value of stored long URL
   res.redirect("/urls");
-})
+});
 
 //add new url
 app.post("/urls", (req, res) => { //route handler for post reqs to /urls
