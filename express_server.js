@@ -17,6 +17,7 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect("/urls") //return to list of urls
 });
 
+//new short url
 app.get("/urls/new", (req, res) => { //route renders template for user to shorten new url
   res.render("urls_new");
 });
@@ -35,29 +36,53 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars); //generates html
 });
 
-//login with username
-app.get("/register", (req, res) => {
-  res.render("urls_register")
-});
-
-app.post("/register", (req, res) => {
-  const usernameLogin = req.body.email;
-  const passwordLogin = req.body.password;
-  //for loop here to search for obj
-  return res.redirect("/");
-});
-
-//logout button
-app.post("/logout", (req, res) => {
-  res.clearCookie("username"); //clear username cookie
-  res.redirect("/login");
-});
-
 //update url
 app.post("/urls/:id", (req, res) => {
   const editURL = urlDatabase[req.params.id];
   urlDatabase[req.params.id] = req.body.editURL; //update value of stored long URL
   res.redirect("/urls");
+});
+
+//register
+app.get("/register", (req, res) => {
+  res.render("urls_register")
+});
+
+// app.post("/register", (req, res) => {
+//   const id = generateRandomString;
+//   const usernameLogin = req.body.email;
+//   const passwordLogin = req.body.password;
+//   //what if register without email/password
+//   if (!usernameLogin || !passwordlogin || users.username fix this) {
+//     res.status(404)
+//   } else {
+//       users[generateRandomString] = {id, usernameLogin, passwordLogin};
+//   };
+//   //what if email already matches a user
+//   //set userid cookie and use to lookup in users obj
+//   //pass user obj to templates
+//   return res.redirect("/urls");
+// });
+
+//login
+app.get("/login", (res, req) =>{
+  res.render("/urls_login")
+});
+
+app.post("/login", (req, res) => {
+  const usernameLogin = userLookup(req.body.email);
+  const passwordLogin = req.body.password;
+  if(usernameLogin && usernameLogin.password === passwordLogin) {
+    res.cookie("user_id", usernameLogin.id)
+    return res.redirect("/");
+  }
+  return res.status(400).send("Your username or password is incorrect");
+});
+
+//logout button
+app.post("/logout", (req, res) => {
+  res.clearCookie("user_id"); //clear username cookie
+  res.redirect("/login");
 });
 
 //add new url
@@ -70,7 +95,7 @@ app.post("/urls", (req, res) => { //route handler for post reqs to /urls
 app.get("/urls", (req, res) => { //shows list of all urls in database
   const templateVars = {
     urls: urlDatabase,
-    username: req.cookies["username"],
+    username: req.cookies["user_id"],
   };
   res.render("urls_index", templateVars); //renders a view, sends html string to client
 });
