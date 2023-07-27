@@ -15,3 +15,5 @@ const users = {
     password: "myMelody2",
   },
 };
+
+module.exports = {urlDatabase, users};

@@ -22,8 +22,8 @@
           </form>
         <% } else { %>
           <form class="form-inline" method="POST">
-            <button type="submit" class="btn btn-primary" onclick="window.location = 'urls_register'">Register</button>
-            <button type="submit" class="btn btn-primary" onclick="window.location = 'urls_login'">Login</button>
+            <button type="button" class="btn btn-primary" onClick="window.location.href = '/register'">Register</button>
+            <button type="submit" class="btn btn-primary" onClick="window.location.href = '/login'">Login</button>
           </form>
           <% } %>
         <% if (user_id) { %>
