@@ -18,12 +18,14 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
         <% if (user_id) { %>
           <form class="form-inline" action="/logout" method="POST">
-            <button type="submit" class="btn btn-primary" onClick="window.location.href = '/logout'">Logout</button>
+            <button type="submit" class="btn btn-primary" onclick="window.location.href = '/logout'">Logout</button>
           </form>
         <% } else { %>
-          <form class="form-inline" method="POST">
-            <button type="button" class="btn btn-primary" onClick="window.location.href = '/register'">Register</button>
-            <button type="submit" class="btn btn-primary" onClick="window.location.href = '/login'">Login</button>
+          <form class="form-inline" action="/register" method="GET">
+            <button type="button" class="btn btn-primary" onclick="window.location.href = '/register'">Register</button>
+          </form>
+          <form class="form-inline" action="/login" method="GET">
+            <button type="submit" class="btn btn-primary" onclick="window.location.href = '/login'">Login</button>
           </form>
           <% } %>
         <% if (user_id) { %>

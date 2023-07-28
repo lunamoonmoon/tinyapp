@@ -20,6 +20,9 @@ app.post("/urls/:id/delete", (req, res) => {
 
 //new short url
 app.get("/urls/new", (req, res) => { //route renders template for user to shorten new url
+  if (!req.cookies["user_id"]) { //if not logged in
+    return res.redirect("/login");
+  };
   const templateVars = {
     user_id: req.cookies["user_id"],
   };
@@ -52,6 +55,9 @@ app.post("/urls/:id", (req, res) => {
 
 //register
 app.get("/register", (req, res) => {
+  if (req.cookies["user_id"]) {
+    return res.redirect("/urls"); //if logged in redirect
+  };
   const templateVars = {
     urls: urlDatabase,
     user_id: req.cookies["user_id"],
@@ -74,10 +80,13 @@ app.post("/register", (req, res) => {
 
 //login
 app.get("/login", (req, res) =>{
+  if (req.cookies["user_id"]) { //if logged in
+    return res.redirect("/urls");
+  };
   const templateVars = {
     user_id: req.cookies["user_id"],
   };
-  res.render("urls_login", templateVars)
+  res.render("urls_login", templateVars) //pass user_id to header template
 });
 
 app.post("/login", (req, res) => {
@@ -101,6 +110,9 @@ app.post("/logout", (req, res) => {
 
 //add new url
 app.post("/urls", (req, res) => { //route handler for post reqs to /urls
+  if (!req.cookies["user_id"]) {
+    return res.status(400).send("Please login to shorten URLs")
+  };
   const randomString = generateRandomString(); //create a unique id for short url id
   urlDatabase[randomString] = req.body.longURL; //add id and long url to database
   res.redirect("/urls/" + randomString); //redirect when post req received
