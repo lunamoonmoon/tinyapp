@@ -73,8 +73,11 @@ app.post("/register", (req, res) => {
 });
 
 //login
-app.get("/login", (res, req) =>{
-  res.render("/urls_login")
+app.get("/login", (req, res) =>{
+  const templateVars = {
+    user_id: req.cookies["user_id"],
+  };
+  res.render("urls_login", templateVars)
 });
 
 app.post("/login", (req, res) => {
@@ -82,11 +85,11 @@ app.post("/login", (req, res) => {
   const passwordLogin = req.body.password;
   if(usernameLogin === null) {
     return res.status(403).send("That email does not have an account");
-  }
+  };
   if(usernameLogin && usernameLogin.password === passwordLogin) {
     res.cookie("user_id", usernameLogin.id)
     return res.redirect("/urls");
-  }
+  };
   return res.status(403).send("Your username or password is incorrect");
 });
 
