@@ -5,7 +5,7 @@ const cookieParser = require('cookie-parser') //parse cookie header populate req
 const PORT = 8080; // default port 8080
 
 const {users, urlDatabase} = require("./database"); //import users and urlDatabase objs
-const {generateRandomString, userLookup} = require("./helperFunctions"); //import helper functions
+const {generateRandomString, userLookup, urlsForUser} = require("./helperFunctions"); //import helper functions
 
 //middleware for human readability
 app.use(express.urlencoded({ extended: true })); //converts binary into readable data
@@ -29,18 +29,25 @@ app.get("/urls/new", (req, res) => { //route renders template for user to shorte
   res.render("urls_new", templateVars);
 });
 
+//access short url
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id];
+  if (!req.cookies["user_id"]) { //if user not logged in
+    return res.status(400).send("Please login to access short urls")
+  };
+  if (urlDatabase[req.params.id].userID !== req.cookies["urls_id"]) { //if user id's don't match
+    return res.status(400).send("Sorry this url isn't yours")
+  };
+  const longURL = urlDatabase[req.params.id].longURL;
   if (longURL) {
     res.redirect(longURL); //if url in database redirect to page
   } else {
     res.status(404); //if not found send error message
-  }
+  };
 });
 
 app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id,
-    longURL: urlDatabase[req.params.id],
+    longURL: urlDatabase[req.params.id].longURL,
     user_id: req.cookies["user_id"],
   }; //Uses the id from route parameter to lookup associated longURL from the urlDatabase
   res.render("urls_show", templateVars); //generates html
@@ -48,8 +55,7 @@ app.get("/urls/:id", (req, res) => {
 
 //update url
 app.post("/urls/:id", (req, res) => {
-  const editURL = urlDatabase[req.params.id];
-  urlDatabase[req.params.id] = req.body.editURL; //update value of stored long URL
+  urlDatabase[req.params.id].longURL = req.body.longURL; //update value of stored long URL
   res.redirect("/urls");
 });
 
@@ -113,14 +119,20 @@ app.post("/urls", (req, res) => { //route handler for post reqs to /urls
   if (!req.cookies["user_id"]) {
     return res.status(400).send("Please login to shorten URLs")
   };
-  const randomString = generateRandomString(); //create a unique id for short url id
-  urlDatabase[randomString] = req.body.longURL; //add id and long url to database
+  const randomString = generateRandomString(); //create a unique id for obj in database
+  urlDatabase[randomString] = {
+    longURL: req.body.longURL,
+    userID: req.cookies["user_id"],
+  }; //add long url and user id to database in random string obj
   res.redirect("/urls/" + randomString); //redirect when post req received
 });
 
 app.get("/urls", (req, res) => { //shows list of all urls in database
+  if (!req.cookies["user_id"]) {
+    return res.status(400).send("Please login to view your shortened urls");
+  };
   const templateVars = {
-    urls: urlDatabase,
+    urls: urlsForUser(req.cookies["user_id"]),
     user_id: req.cookies["user_id"],
   };
   res.render("urls_index", templateVars); //renders a view, sends html string to client
