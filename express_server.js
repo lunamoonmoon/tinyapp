@@ -14,6 +14,12 @@ app.use(cookieParser()); //use cookie obj middleware
 
 //delete url
 app.post("/urls/:id/delete", (req, res) => {
+  if (!urlDatabase.req.params.id) {
+    return res.status(400).send("Short url doesn't exist")
+  };
+  if (!req.cookies["user_id"] || urlDatabase.req.cookies["user_id"] !== req.cookies["user_id"]) { //if user id's don't match
+    return res.status(400).send("Sorry this url isn't yours")
+  };
   delete urlDatabase[req.params.id]; //delete specified url
   res.redirect("/urls") //return to list of urls
 });
@@ -34,7 +40,7 @@ app.get("/u/:id", (req, res) => {
   if (!req.cookies["user_id"]) { //if user not logged in
     return res.status(400).send("Please login to access short urls")
   };
-  if (urlDatabase[req.params.id].userID !== req.cookies["urls_id"]) { //if user id's don't match
+  if (urlDatabase[req.params.id].userID !== req.cookies["user_id"]) { //if user id's don't match
     return res.status(400).send("Sorry this url isn't yours")
   };
   const longURL = urlDatabase[req.params.id].longURL;
@@ -55,6 +61,12 @@ app.get("/urls/:id", (req, res) => {
 
 //update url
 app.post("/urls/:id", (req, res) => {
+  if (!urlDatabase.req.params.id) {
+    return res.status(400).send("Short url doesn't exist")
+  };
+  if (!req.cookies["user_id"] || urlDatabase.req.params.id.req.cookies["user_id"] !== req.cookies["user_id"]) { //if user id's don't match
+    return res.status(400).send("Sorry this url isn't yours")
+  };
   urlDatabase[req.params.id].longURL = req.body.longURL; //update value of stored long URL
   res.redirect("/urls");
 });
