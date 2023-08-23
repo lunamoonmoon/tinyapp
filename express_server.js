@@ -15,7 +15,7 @@ app.set("view engine", "ejs"); //set view/template engine for rendering template
 
 //delete url
 app.post("/urls/:id/delete", (req, res) => {
-  if (!urlDatabase.req.params.id) {
+  if (!urlDatabase[req.params.id]) {
     return res.status(400).send("Short url doesn't exist")
   };
   if (!req.session.user_id || urlDatabase.req.session.user_id !== req.session.user_id) { //if user id's don't match
@@ -38,34 +38,41 @@ app.get("/urls/new", (req, res) => { //route renders template for user to shorte
 
 //access short url
 app.get("/u/:id", (req, res) => {
-  if (!req.session.user_id) { //if user not logged in
-    return res.status(400).send("Please login to access short urls")
-  };
-  if (urlDatabase[req.params.id].userID !== req.session.user_id) { //if user id's don't match
-    return res.status(400).send("Sorry this url isn't yours")
-  };
   const longURL = urlDatabase[req.params.id].longURL;
   if (longURL) {
     res.redirect(longURL); //if url in database redirect to page
   } else {
-    res.status(404); //if not found send error message
+    res.status(404).send("URL not found"); //if not found send error message
   };
 });
 
 app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id,
+    shortURL: req.params.id,
     longURL: urlDatabase[req.params.id].longURL,
-    user_id: req.session.user_id,
+    user_id: req.session.user_id
   }; //Uses the id from route parameter to lookup associated longURL from the urlDatabase
+  if (!urlDatabase[req.params.id]) {
+    return res.status(400).send("Short url doesn't exist")
+  };
+  if (urlDatabase[req.params.id].userID !== req.session.user_id) { //if user id's don't match
+    return res.status(400).send("Sorry this url isn't yours")
+  };
+  if (!req.session.user_id) {
+    return res.status(400).send("Please login first")
+  };
   res.render("urls_show", templateVars); //generates html
 });
 
 //update url
 app.post("/urls/:id", (req, res) => {
-  if (!urlDatabase.req.params.id) {
+  if (!req.session.user_id) {
+    return res.status(400).send("Please login first")
+  };
+  if (!urlDatabase[req.params.id]) {
     return res.status(400).send("Short url doesn't exist")
   };
-  if (!req.session.user_id || urlDatabase.req.params.id.req.session.user_id !== req.session.user_id) { //if user id's don't match
+  if (!req.session.user_id || urlDatabase[randomString].userID !== req.session.user_id) { //if user id's don't match
     return res.status(400).send("Sorry this url isn't yours")
   };
   urlDatabase[req.params.id].longURL = req.body.longURL; //update value of stored long URL
@@ -88,7 +95,8 @@ app.post("/register", (req, res) => {
   const id = generateRandomString();
   const usernameLogin = req.body.email;
   const hashedPassword = bcrypt.hashSync(req.body.password, 10);
-  if (!usernameLogin || !req.body.password || userLookup(usernameLogin) !== null) { //if username or password empty or the email is already registered
+
+  if (!usernameLogin || !req.body.password || userLookup(usernameLogin, urlDatabase) !== null) { //if username or password empty or the email is already registered
     res.status(400).send("Invalid registration");
   } else {
   users[id] = {id, email: usernameLogin, password: hashedPassword}; //log to usesrs obj
@@ -109,12 +117,13 @@ app.get("/login", (req, res) =>{
 });
 
 app.post("/login", (req, res) => {
-  const usernameLogin = userLookup(req.body.email);
-  if(usernameLogin === null) {
+  const usernameLogin = userLookup(req.body.email, users);
+
+  if(!usernameLogin) {
     return res.status(403).send("That email does not have an account");
   };
-  if(usernameLogin && bcrypt.compareSync(req.body.password, hashedPassword)) {
-    res.session.user_id = usernameLogin.id;
+  if(bcrypt.compareSync(req.body.password, users[usernameLogin].password)) {
+    req.session.user_id = usernameLogin.id;
     return res.redirect("/urls");
   };
   return res.status(403).send("Your username or password is incorrect");
@@ -131,12 +140,12 @@ app.post("/urls", (req, res) => { //route handler for post reqs to /urls
   if (!req.session.user_id) {
     return res.status(400).send("Please login to shorten URLs")
   };
-  const randomString = generateRandomString(); //create a unique id for obj in database
+  randomString = generateRandomString();
   urlDatabase[randomString] = {
     longURL: req.body.longURL,
     userID: req.session.user_id,
   }; //add long url and user id to database in random string obj
-  res.redirect("/urls/" + randomString); //redirect when post req received
+res.redirect("/urls/" + randomString); //redirect when post req received
 });
 
 app.get("/urls", (req, res) => { //shows list of all urls in database
@@ -156,6 +165,14 @@ app.get("/urls.json", (req, res) => {
 
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
+});
+
+app.get("/", (req, res) => { //route renders template based on login status
+  if (!req.session.user_id) { //if not logged in
+    return res.redirect("/login");
+  } else {
+    return res.redirect("/urls");
+  };
 });
 
 app.listen(PORT, () => { //listen goes last
