@@ -34,24 +34,33 @@ app.post("/urls/:id/delete", (req, res) => {
 
 //edit short url
 app.get("/urls/:id/edit", (req, res) => {
-  if (!urlDatabase[req.params.id]) {
-    return res.status(400).send("Short URL doesn't exist");
-  }
+  const shortURL = req.params.id;
+  const urlData = urlDatabase[shortURL];
+
+  // if (!urlData) {
+  //   return res.status(400).send("Short URL doesn't exist");
+  // }
 
   const templateVars = {
-    shortURL: req.params.id,
-    longURL: urlDatabase[req.params.id].longURL,
+    shortURL: shortURL,
+    longURL: urlData.longURL,
     user: req.session.user_id
   };
-  res.render("urls_edit", templateVars);
+  res.render("urls_show", templateVars);
 });
 
 app.post("/urls/:id/edit", (req, res) => {
-if(!urlDatabase[req.params.id]) {
+  const shortURL = req.params.id;
+  const urlData = urlDatabase[shortURL];
+
+  if (!urlData) {
     return res.status(400).send("Short URL doesn't exist");
   }
-
-  urlDatabase[req.params.id].longURL = req.body.newURL; //update value of stored long URL
+// if(!urlDatabase[req.params.id]) {
+//     return res.status(400).send("Short URL doesn't exist");
+//   }
+console.log(urlDatabase[shortURL].longURL, req.body.newURL);
+  urlDatabase[shortURL].longURL = req.body.newURL; //update value of stored long URL
 
   res.redirect("/urls");
 });
@@ -94,7 +103,7 @@ app.get("/urls/:id", (req, res) => {
 
   const templateVars = {
     id: shortURL,
-    shortURL: shortURL,
+    shortURL,
     longURL: url.longURL,
     user: req.session.user_id
   }; //Uses the id from route parameter to lookup associated longURL from the urlDatabase
@@ -198,7 +207,6 @@ app.get("/urls", (req, res) => { //shows list of all urls in database
   const templateVars = {
     urls: urlsForUser(req.session.user_id),
     user: users[req.session.user_id],
-    shortURL: generateRandomString(),
   };
   res.render("urls_index", templateVars); //renders a view, sends html string to client
 });
