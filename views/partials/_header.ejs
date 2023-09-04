@@ -16,7 +16,8 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-        <% if (user_id) { %>
+        <% if (user) { %>
+          <span class="nav-item nav-link"> Hi <%= user.email %></span>
           <form class="form-inline" action="/logout" method="POST">
             <button type="submit" class="btn btn-primary" onclick="window.location.href = '/logout'">Logout</button>
           </form>
@@ -28,9 +29,6 @@
             <button type="submit" class="btn btn-primary" onclick="window.location.href = '/login'">Login</button>
           </form>
           <% } %>
-        <% if (user_id) { %>
-        <span class="nav-item nav-link"> Hi <%= user_id %></span>
-        <% } %>
       </div>
     </div>
   </nav>

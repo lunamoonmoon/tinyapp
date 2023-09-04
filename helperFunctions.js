@@ -9,10 +9,10 @@ function generateRandomString() { //create random 6 digit number string for shor
 };
 
 //lookup email in users obj
-function userLookup(email, database) {
-  for(let i in database) {
-    if(email === database[i].email) {
-      return database[i].userID;
+function userLookup(email) {
+  for(let userID in users) {
+    if(email === users[userID].email) {
+      return users[userID];
     };
   };
   return null;

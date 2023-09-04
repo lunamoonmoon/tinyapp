@@ -10,12 +10,12 @@ const urlDatabase = { //create database object to store url mappings
 };
 
 const users = {
-  userOne: {
+  "userOne": {
     id: "one",
     email: "hellokitty@email.com",
     password: "Sanrio1",
   },
-  userTwo: {
+  "userTwo": {
     id: "two",
     email: "cinnamaroll@gmail.com",
     password: "myMelody2",
